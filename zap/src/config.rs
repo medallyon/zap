@@ -7,6 +7,7 @@ pub struct Config<'src> {
 	pub tydecls: Vec<TyDecl<'src>>,
 	pub evdecls: Vec<EvDecl<'src>>,
 	pub fndecls: Vec<FnDecl<'src>>,
+	pub propdecls: Vec<PropDecl<'src>>,
 
 	pub typescript: bool,
 	pub typescript_max_tuple_length: f64,
@@ -135,6 +136,15 @@ pub struct EvDecl<'src> {
 	pub call: EvCall,
 	pub data: Vec<Parameter<'src>>,
 	pub id: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct PropDecl<'src> {
+	pub name: &'src str, 
+	pub from: EvSource,
+	pub evty: EvType,
+	pub call: EvCall,
+	pub data: Vec<Parameter<'src>>,
 }
 
 #[derive(Debug, Clone)]

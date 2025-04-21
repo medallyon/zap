@@ -1244,6 +1244,11 @@ impl<'src> ClientOutput<'src> {
 
 		self.push_return_outgoing();
 		self.push_return_listen();
+
+		for prop in self.config.propdecls.iter() {
+			self.push_property(prop);
+		}
+
 		self.push_return_functions();
 
 		self.dedent();
@@ -1304,6 +1309,44 @@ impl<'src> ClientOutput<'src> {
 		self.push_line("error(\"Cannot use the client module on the server!\")");
 		self.dedent();
 		self.push_line("end");
+	}
+
+	fn push_property(&mut self, prop: &PropDecl<'src>) {
+		let name = prop.name;
+		
+		self.push_line(&format!("{name} = {{"));
+		self.indent();
+
+		// Get current value
+		self.push_indent();
+		self.push_line("Get = function()");
+		self.indent();
+		self.push_line(&format!("return get_property_value(\"{name}\")"));
+		self.dedent();
+		self.push_line("end,");
+
+		// Changed signal
+		self.push_indent();
+		self.push_line("Changed = {");
+		self.indent();
+		self.push_line("Connect = function(callback)");
+		self.indent();
+		self.push_line(&format!("return connect_property_changed(\"{name}\", callback)"));
+		self.dedent();
+		self.push_line("end");
+		self.dedent();
+		self.push_line("},");
+
+		// Observe method
+		self.push_indent();
+		self.push_line("Observe = function(callback)");
+		self.indent(); 
+		self.push_line(&format!("return observe_property(\"{name}\", callback)"));
+		self.dedent();
+		self.push_line("end,");
+
+		self.dedent();
+		self.push_line("},");
 	}
 
 	pub fn output(mut self) -> String {

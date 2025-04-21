@@ -109,3 +109,63 @@ local types = {}
 
 local polling_queues_reliable = {}
 local polling_queues_unreliable = {}
+
+-- Property handling 
+local property_values = {}
+local property_listeners = {}
+
+local function handle_property_change(name: string, value: any)
+	local changed = value ~= property_values[name]
+	property_values[name] = value
+	
+	if changed then
+		local listeners = property_listeners[name]
+		if listeners then
+			for _, callback in listeners do
+				task.spawn(callback, value)
+			end
+		end
+	end
+end
+
+local function get_property_value(name: string): any
+	return property_values[name]
+end
+
+local function observe_property(name: string, callback: (any) -> ())
+	if property_values[name] ~= nil then
+		task.defer(callback, property_values[name])
+	end
+
+	local listeners = property_listeners[name]
+	if not listeners then
+		listeners = {}
+		property_listeners[name] = listeners
+	end
+	
+	table.insert(listeners, callback)
+	
+	return function()
+		local idx = table.find(listeners, callback)
+		if idx then
+			table.remove(listeners, idx)
+		end
+	end
+end
+
+local function connect_property_changed(name: string, callback: (any) -> ()): () -> ()
+	local listeners = property_listeners[name]
+	if not listeners then
+		listeners = {}
+		property_listeners[name] = listeners
+	end
+	
+	table.insert(listeners, callback)
+	
+	return function()
+		local idx = table.find(listeners, callback)
+		if idx then
+			table.remove(listeners, idx)
+		end
+	end
+end

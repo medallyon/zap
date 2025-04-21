@@ -49,6 +49,7 @@ impl<'src> Converter<'src> {
 		let mut tydecls = Vec::new();
 		let mut evdecls = Vec::new();
 		let mut fndecls = Vec::new();
+		let mut propdecls = Vec::new();
 
 		let mut server_reliable_id = 0;
 		let mut server_unreliable_id = 0;
@@ -105,6 +106,13 @@ impl<'src> Converter<'src> {
 			server_reliable_id += 1;
 		}
 
+		for propdecl in config.decls.iter().filter_map(|decl| match decl {
+			SyntaxDecl::Prop(propdecl) => Some(propdecl),
+			_ => None,
+		}) {
+			propdecls.push(self.propdecl(propdecl));
+		}
+
 		if evdecls.is_empty() && fndecls.is_empty() {
 			self.report(Report::AnalyzeEmptyEvDecls);
 		}
@@ -136,6 +144,7 @@ impl<'src> Converter<'src> {
 			tydecls,
 			evdecls,
 			fndecls,
+			propdecls,
 
 			typescript,
 			typescript_max_tuple_length,
@@ -519,6 +528,29 @@ impl<'src> Converter<'src> {
 			rets,
 			client_id,
 			server_id,
+		}
+	}
+
+	fn propdecl(&mut self, syntax_prop: &SyntaxPropDecl<'src>) -> PropDecl<'src> {
+		if let Some(syntax_parameters) = &syntax_prop.data {
+			self.check_duplicate_parameters(syntax_parameters);
+		}
+
+		PropDecl {
+			name: syntax_prop.name.name,
+			from: syntax_prop.from,
+			evty: syntax_prop.evty,
+			call: syntax_prop.call,
+			data: syntax_prop.data.as_ref().map(|parameters| {
+				parameters
+					.parameters
+					.iter()
+					.map(|(identifier, ty)| {
+						let name = identifier.map(|identifier| identifier.name);
+						Parameter { name, ty: self.ty(ty) }
+					})
+					.collect()
+			}).unwrap_or_default(),
 		}
 	}
 

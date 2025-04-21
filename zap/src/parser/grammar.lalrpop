@@ -38,6 +38,7 @@ Decl: SyntaxDecl<'input> = {
     <decl:TyDecl> => SyntaxDecl::Ty(decl),
     <decl:EvDecl> => SyntaxDecl::Ev(decl),
     <decl:FnDecl> => SyntaxDecl::Fn(decl),
+    PropDecl => SyntaxDecl::Prop(<>),
 }
 
 FnDecl: SyntaxFnDecl<'input> = {
@@ -246,5 +247,17 @@ Comma<T>: Vec<T> = {
     <mut v:(<T> ",")*> <e:T?> => match e {
         Some(e) => { v.push(e); v },
         None => v,
+    }
+}
+
+PropDecl: SyntaxPropDecl<'input> = {
+    <start:@L> "prop" <name:Identifier> "=" "{" <from:"Server"> "," <evty:EvTy> "," <call:EvCall> "," <data:Parameters>? "}" <end:@R> => SyntaxPropDecl {
+        start,
+        name,
+        from: EvSource::Server,
+        evty,
+        call,
+        data,
+        end,
     }
 }

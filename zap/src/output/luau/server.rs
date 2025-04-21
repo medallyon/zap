@@ -1340,6 +1340,10 @@ impl<'a> ServerOutput<'a> {
 		self.push_return_outgoing();
 		self.push_return_listen();
 
+		for prop in self.config.propdecls.iter() {
+			self.push_property(prop);
+		}
+
 		self.dedent();
 		self.push_line("}");
 
@@ -1452,6 +1456,44 @@ impl<'a> ServerOutput<'a> {
 		self.push_line("player_map[player] = nil");
 		self.dedent();
 		self.push_line("end)");
+	}
+
+	fn push_property(&mut self, prop: &PropDecl<'src>) {
+		let name = prop.name;
+
+		self.push_line(&format!("{name} = {{"));
+		self.indent();
+
+		// Set value for all
+		self.push_indent();
+		self.push_line("Set = function(value)"); 
+		self.indent();
+		self.push_line("for _, player in Players:GetPlayers() do");
+		self.push_line(&format!("    {name}.FireAll(value)"));
+		self.push_line("end");
+		self.dedent();
+		self.push_line("end,");
+
+		// Set for specific player
+		self.push_indent();
+		self.push_line("SetFor = function(player, value)");
+		self.indent();
+		self.push_line(&format!("{name}.Fire(player, value)"));
+		self.dedent(); 
+		self.push_line("end,");
+
+		// Set for list of players
+		self.push_indent();
+		self.push_line("SetForList = function(players, value)");
+		self.indent();
+		self.push_line("for _, player in players do");
+		self.push_line(&format!("    {name}.Fire(player, value)")); 
+		self.push_line("end");
+		self.dedent();
+		self.push_line("end,");
+
+		self.dedent();
+		self.push_line("},");
 	}
 
 	pub fn output(mut self) -> String {

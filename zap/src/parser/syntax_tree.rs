@@ -72,6 +72,7 @@ pub enum SyntaxDecl<'src> {
 	Ty(SyntaxTyDecl<'src>),
 	Ev(SyntaxEvDecl<'src>),
 	Fn(SyntaxFnDecl<'src>),
+	Prop(SyntaxPropDecl<'src>), // New
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -102,6 +103,22 @@ pub struct SyntaxEvDecl<'src> {
 }
 
 impl Spanned for SyntaxEvDecl<'_> {
+	fn span(&self) -> Span {
+		self.start..self.end
+	}
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SyntaxPropDecl<'src> {
+	pub start: usize,
+	pub name: SyntaxIdentifier<'src>,
+	pub evty: EvType,
+	pub call: EvCall,
+	pub data: Option<SyntaxParameters<'src>>,
+	pub end: usize,
+}
+
+impl Spanned for SyntaxPropDecl<'_> {
 	fn span(&self) -> Span {
 		self.start..self.end
 	}
