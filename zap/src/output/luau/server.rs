@@ -1,7 +1,7 @@
 use std::{cmp::max, collections::HashMap};
 
 use crate::{
-	config::{Config, EvCall, EvDecl, EvSource, EvType, FnCall, FnDecl, Parameter, TyDecl, UNRELIABLE_ORDER_NUMTY},
+	config::{Config, EvCall, EvDecl, EvSource, EvType, FnCall, FnDecl, Parameter, TyDecl, UNRELIABLE_ORDER_NUMTY, PropDecl},
 	irgen::{des, ser},
 	output::{
 		get_named_values, get_unnamed_values,
@@ -18,7 +18,7 @@ struct ServerOutput<'src> {
 	var_occurrences: HashMap<String, usize>,
 }
 
-impl Output for ServerOutput<'_> {
+impl<'src> Output for ServerOutput<'src> {
 	fn push(&mut self, s: &str) {
 		self.buf.push_str(s);
 	}
@@ -38,8 +38,8 @@ impl Output for ServerOutput<'_> {
 	}
 }
 
-impl<'a> ServerOutput<'a> {
-	pub fn new(config: &'a Config) -> Self {
+impl<'src> ServerOutput<'src> {
+	pub fn new(config: &'src Config) -> Self {
 		Self {
 			config,
 			tabs: 0,
@@ -1469,7 +1469,7 @@ impl<'a> ServerOutput<'a> {
 		self.push_line("Set = function(value)"); 
 		self.indent();
 		self.push_line("for _, player in Players:GetPlayers() do");
-		self.push_line(&format!("    {name}.FireAll(value)"));
+		self.push_line(&format!("    {name}.Fire(player, value)"));
 		self.push_line("end");
 		self.dedent();
 		self.push_line("end,");

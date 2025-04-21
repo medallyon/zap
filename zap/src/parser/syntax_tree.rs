@@ -112,6 +112,7 @@ impl Spanned for SyntaxEvDecl<'_> {
 pub struct SyntaxPropDecl<'src> {
 	pub start: usize,
 	pub name: SyntaxIdentifier<'src>,
+	pub from: EvSource,
 	pub evty: EvType,
 	pub call: EvCall,
 	pub data: Option<SyntaxParameters<'src>>,

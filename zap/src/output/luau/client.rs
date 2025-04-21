@@ -1,7 +1,7 @@
 use std::{cmp::max, collections::HashMap};
 
 use crate::{
-	config::{Config, EvCall, EvDecl, EvSource, EvType, FnDecl, Parameter, TyDecl, YieldType, UNRELIABLE_ORDER_NUMTY},
+	config::{Config, EvCall, EvDecl, EvSource, EvType, FnDecl, Parameter, TyDecl, YieldType, UNRELIABLE_ORDER_NUMTY, PropDecl},
 	irgen::{des, ser},
 	output::{
 		get_named_values, get_unnamed_values,

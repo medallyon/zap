@@ -251,7 +251,7 @@ Comma<T>: Vec<T> = {
 }
 
 PropDecl: SyntaxPropDecl<'input> = {
-    <start:@L> "prop" <name:Identifier> "=" "{" <from:"Server"> "," <evty:EvTy> "," <call:EvCall> "," <data:Parameters>? "}" <end:@R> => SyntaxPropDecl {
+    <start:@L> "prop" <name:Identifier> "=" "{" <from:"Server"> "," <evty:EvTy> "," <call:EvCall> <data:("," <Parameters>)?> "}" <end:@R> => SyntaxPropDecl {
         start,
         name,
         from: EvSource::Server,

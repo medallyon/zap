@@ -4,7 +4,7 @@ use std::{
 };
 
 use crate::config::{
-	Casing, Config, Enum, EvCall, EvDecl, EvSource, EvType, FnDecl, NonPrimitiveTy, NumTy, Parameter, PrimitiveTy,
+	Casing, Config, Enum, EvCall, EvDecl, EvSource, EvType, FnDecl, NonPrimitiveTy, NumTy, Parameter, PrimitiveTy, PropDecl,
 	Range, Struct, Ty, TyDecl, YieldType, UNRELIABLE_ORDER_NUMTY,
 };
 
@@ -548,7 +548,7 @@ impl<'src> Converter<'src> {
 
 		PropDecl {
 			name: syntax_prop.name.name,
-			from: syntax_prop.from,
+			from: EvSource::Server,
 			evty: syntax_prop.evty,
 			call: syntax_prop.call,
 			data: syntax_prop.data.as_ref().map(|parameters| {
