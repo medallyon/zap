@@ -389,6 +389,16 @@ impl<'src> Converter<'src> {
 						});
 					}
 				}
+
+				SyntaxDecl::Prop(prop) => {
+					if let Some(prev_span) = ntdecls.insert(prop.name.name, prop.span()) {
+						self.report(Report::AnalyzeDuplicateDecl {
+							prev_span,
+							dup_span: prop.span(),
+							name: prop.name.name,
+						});
+					}
+				}
 			}
 		}
 	}
